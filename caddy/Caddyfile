@@ -4,7 +4,7 @@ erp-dpp-byo.digiprodpass.com {
 
     log {
         output file /data/caddy/access.log
-        format single_field common_log
+        format console
     }
 
     tls {
