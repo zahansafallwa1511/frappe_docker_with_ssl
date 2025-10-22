@@ -1,12 +1,13 @@
+version: "3.8"
+
 services:
   traefik:
     image: traefik:v2.10
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: on-failure
     command:
-      - "--api.insecure=true"
+      - "--api.insecure=true"                    # Optional dashboard at https://traefik.yourdomain
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
@@ -23,11 +24,9 @@ services:
 
   backend:
     image: frappe/erpnext:v15.84.0
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -39,11 +38,9 @@ services:
 
   configurator:
     image: frappe/erpnext:v15.84.0
+    restart: "no"
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: none
     entrypoint:
       - bash
       - -c
@@ -67,14 +64,9 @@ services:
 
   create-site:
     image: frappe/erpnext:v15.84.0
+    restart: "no"
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: none
-    volumes:
-      - sites:/home/frappe/frappe-bench/sites
-      - logs:/home/frappe/frappe-bench/logs
     entrypoint:
       - bash
       - -c
@@ -96,18 +88,19 @@ services:
       done;
       echo "sites/common_site_config.json found";
       bench new-site --mariadb-user-host-login-scope='%' --admin-password=admin --db-root-username=root --db-root-password=admin --install-app erpnext --set-default frontend;
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
 
   db:
     image: mariadb:10.6
+    restart: on-failure
     networks:
       - frappe_network
     healthcheck:
       test: mysqladmin ping -h localhost --password=admin
       interval: 1s
       retries: 20
-    deploy:
-      restart_policy:
-        condition: on-failure
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
@@ -121,13 +114,11 @@ services:
 
   frontend:
     image: frappe/erpnext:v15.84.0
+    restart: on-failure
     networks:
       - frappe_network
     depends_on:
       - websocket
-    deploy:
-      restart_policy:
-        condition: on-failure
     command:
       - nginx-entrypoint.sh
     environment:
@@ -143,22 +134,23 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
-    ports:
-      - "8080:8080"
-
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.erpnext.rule=Host(`erp-byo.digiprodpass.com`)"
       - "traefik.http.routers.erpnext.entrypoints=websecure"
       - "traefik.http.routers.erpnext.tls.certresolver=myresolver"
+      - "traefik.http.services.erpnext.loadbalancer.server.port=8080"  # Important!
+      # Optional HTTP → HTTPS redirect
+      - "traefik.http.routers.erpnext-http.rule=Host(`erp-byo.digiprodpass.com`)"
+      - "traefik.http.routers.erpnext-http.entrypoints=web"
+      - "traefik.http.routers.erpnext-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   queue-long:
     image: frappe/erpnext:v15.84.0
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
     command:
       - bench
       - worker
@@ -173,11 +165,9 @@ services:
 
   queue-short:
     image: frappe/erpnext:v15.84.0
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
     command:
       - bench
       - worker
@@ -192,29 +182,23 @@ services:
 
   redis-queue:
     image: redis:6.2-alpine
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
     volumes:
       - redis-queue-data:/data
 
   redis-cache:
     image: redis:6.2-alpine
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
 
   scheduler:
     image: frappe/erpnext:v15.84.0
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
     command:
       - bench
       - schedule
@@ -224,11 +208,9 @@ services:
 
   websocket:
     image: frappe/erpnext:v15.84.0
+    restart: on-failure
     networks:
       - frappe_network
-    deploy:
-      restart_policy:
-        condition: on-failure
     command:
       - node
       - /home/frappe/frappe-bench/apps/frappe/socketio.js
