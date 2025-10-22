@@ -1,0 +1,9 @@
+
+erp-dpp-byo.digiprodpass.com {
+    reverse_proxy frontend:8080
+    encode gzip
+    log {
+        output file /data/access.log
+        format single_field common_log
+    }
+}
