@@ -110,6 +110,7 @@ services:
       - "traefik.http.routers.erpnext.rule=Host(`${FRAPPE_SITE_NAME}`)"
       - "traefik.http.routers.erpnext.entrypoints=websecure"
       - "traefik.http.routers.erpnext.tls.certresolver=myresolver"
+      - "traefik.http.services.erpnext.loadbalancer.server.port=8080"
     networks:
       - frappe_network
     restart: unless-stopped
