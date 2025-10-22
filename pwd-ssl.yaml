@@ -10,7 +10,7 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=mail@example.com"
+      - "--certificatesresolvers.myresolver.acme.email=safallwa@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
@@ -148,7 +148,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.erpnext.rule=Host(`erp.example.com`)"
+      - "traefik.http.routers.erpnext.rule=Host(`erp-byo.digiprodpass.com`)"
       - "traefik.http.routers.erpnext.entrypoints=websecure"
       - "traefik.http.routers.erpnext.tls.certresolver=myresolver"
 
