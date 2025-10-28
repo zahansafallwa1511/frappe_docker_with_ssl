@@ -92,7 +92,7 @@ services:
           fi
         done;
         echo "sites/common_site_config.json found";
-        bench new-site --mariadb-user-host-login-scope='%' --admin-password=admin --db-root-username=root --db-root-password=admin --install-app erpnext --set-default erp-byo-dpp-dos.digiprodpass.com;
+        bench new-site --mariadb-user-host-login-scope='%' --admin-password=admin --db-root-username=root --db-root-password=admin --install-app erpnext --set-default erp-byo-dpp-tres.digiprodpass.com;
 
   db:
     image: mariadb:10.6
@@ -129,7 +129,7 @@ services:
       - nginx-entrypoint.sh
     environment:
       BACKEND: backend:8000
-      FRAPPE_SITE_NAME_HEADER: erp-byo-dpp-dos.digiprodpass.com
+      FRAPPE_SITE_NAME_HEADER: erp-byo-dpp-tres.digiprodpass.com
       SOCKETIO: websocket:9000
       UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
       UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
