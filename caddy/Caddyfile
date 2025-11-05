@@ -1,29 +1,20 @@
 erp-dpp-byo-tres.digiprodpass.com {
     encode gzip
 
-    # Handle CORS for all requests
-    @cors {
-        path_regexp .*
-    }
-
-    header @cors {
-        Access-Control-Allow-Origin "*"
-        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-        Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
-        Access-Control-Allow-Credentials false
-    }
-
-    # Preflight OPTIONS requests
     @options {
         method OPTIONS
     }
-    respond @options 204
 
-    # Proxy to ERPNext backend (Frappe)
-    reverse_proxy erpnext:8000 {
+    respond @options 204
+    header @options {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+
+    reverse_proxy frontend:8080 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-Proto {scheme}
     }
 
     log {
