@@ -1,6 +1,23 @@
 erp-dpp-byo-tres.digiprodpass.com {
     encode gzip
 
+    @options {
+        method OPTIONS
+    }
+
+    header @options {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        defer
+    }
+
+    header {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+
     reverse_proxy frontend:8080 {
         header_up Host {host}
         header_up X-Forwarded-Host {host}
@@ -17,4 +34,5 @@ erp-dpp-byo-tres.digiprodpass.com {
         issuer acme
     }
 }
+
 
