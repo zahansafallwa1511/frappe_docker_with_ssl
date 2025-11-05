@@ -1,4 +1,4 @@
-erp-dpp-byo-dos.digiprodpass.com {
+erp-dpp-byo-tres.digiprodpass.com {
     encode gzip
 
     reverse_proxy frontend:8080 {
