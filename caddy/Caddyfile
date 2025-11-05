@@ -1,20 +1,17 @@
 erp-dpp-byo-tres.digiprodpass.com {
     encode gzip
 
-    # Handle all OPTIONS preflight requests
     @options {
         method OPTIONS
-        path *   # match all paths
-    }
-    respond @options 204 {
-        headers {
-            Access-Control-Allow-Origin "*"
-            Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-            Access-Control-Allow-Headers "Content-Type, Authorization"
-        }
     }
 
-    # All other requests go to upstream
+    respond @options 204
+    header @options {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+
     reverse_proxy frontend:8080 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
