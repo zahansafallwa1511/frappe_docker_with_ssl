@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CORS Test for PDF</title>
+</head>
+<body>
+  <script>
+    const fileUrl = "https://erp-dpp-byo.digiprodpass.com/files/dummy-pdf_2.pdf";
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", fileUrl, true);
+    xhr.responseType = "blob"; // treat as file/blob
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        console.log("File fetched successfully!", xhr.response);
+        const url = URL.createObjectURL(xhr.response);
+        console.log("File URL (blob):", url);
+        // Optional: open the file in new tab
+        // window.open(url);
+      } else {
+        console.error("Failed to fetch file. Status:", xhr.status);
+      }
+    };
+
+    xhr.onerror = function () {
+      console.error("CORS error triggered!");
+    };
+
+    xhr.send();
+  </script>
+</body>
+</html>

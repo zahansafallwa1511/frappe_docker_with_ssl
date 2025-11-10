@@ -1,6 +1,31 @@
 erp-dpp-byo-dos.digiprodpass.com {
     encode gzip
 
+    # ================================
+    # 1. CORS for /files/* (Any Origin)
+    # ================================
+    @files {
+        path /files/*
+    }
+
+    handle @files {
+        header Access-Control-Allow-Origin "*"
+        header Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD"
+        header Access-Control-Allow-Headers "*"
+        # Note: If using cookies/auth, Access-Control-Allow-Credentials can't be "*"
+        # header Access-Control-Allow-Credentials "true"
+
+        reverse_proxy frontend:8080 {
+            header_up Host {host}
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    # ================================
+    # 2. Default Reverse Proxy (API, HTML, JS)
+    # ================================
     reverse_proxy frontend:8080 {
         header_up Host {host}
         header_up X-Forwarded-Host {host}
@@ -8,13 +33,18 @@ erp-dpp-byo-dos.digiprodpass.com {
         header_up X-Real-IP {remote_host}
     }
 
+    # ================================
+    # Logging
+    # ================================
     log {
         output file /data/caddy/access.log
         format console
     }
 
+    # ================================
+    # TLS
+    # ================================
     tls {
         issuer acme
     }
 }
-
